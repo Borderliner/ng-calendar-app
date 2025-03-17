@@ -18,6 +18,7 @@
     <div class="p-4 cursor-pointer relative hover:bg-gray-100 transition-colors rounded"
       *ngFor="let day of daysInMonth"
       (click)="selectDay(day)"
+      (dblclick)="openEventDialog(day)"
       [class]="day && selectedDate && isSameDay(day, selectedDate) ? 'text-white bg-indigo-500 hover:bg-indigo-700' : ''"
       [class.text-gray-400]="day && day.getMonth() !== currentDate.getMonth()">
       {{ day ? (day | date: 'd') : '' }}
@@ -30,10 +31,24 @@
   <div class="mt-6 p-4 bg-gray-50 rounded-lg" *ngIf="selectedDate">
     <h3 class="text-lg font-semibold text-gray-800">Events for {{ selectedDate | date: 'MMMM d, yyyy' }}</h3>
     <mat-list>
-      <p class="text-gray-700" *ngFor="let event of getEventsForDay(selectedDate)">
-        {{ event.title }}
-      </p>
-      <p class="text-gray-500 italic" *ngIf="getEventsForDay(selectedDate).length === 0">
+      <div class="text-gray-700 py-2" *ngFor="let event of getEventsForDay(selectedDate); let i = index">
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <span>{{ i + 1 }}.</span>
+            <span class="font-medium">{{ event.title }}</span>
+            <span class="text-sm text-gray-500">({{ event.time }})</span>
+            <span class="text-sm" [ngClass]="{
+              'text-green-600': event.urgency === 'Low',
+              'text-yellow-600': event.urgency === 'Medium',
+              'text-red-600': event.urgency === 'High'
+            }">{{ event.urgency }}</span>
+          </div>
+
+          <span class="text-sm italic text-gray-500">{{ event.description }}</span>
+
+        </div>
+      </div>
+      <p class="text-black italic" *ngIf="getEventsForDay(selectedDate).length === 0">
         No events
       </p>
     </mat-list>
