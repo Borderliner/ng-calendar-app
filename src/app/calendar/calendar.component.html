@@ -1,10 +1,25 @@
 <div class="container mx-auto p-6 max-w-4xl bg-white shadow-lg rounded-lg">
   <!-- Toolbar -->
-  <mat-toolbar class="flex justify-between items-center mb-6 bg-indigo-600 text-white rounded-t-lg">
+  <mat-toolbar class="flex! justify-between! items-center! bg-indigo-600! text-white! rounded-t-lg!">
     <button mat-icon-button (click)="changeMonth(-1)" class="hover:bg-indigo-700 transition-colors">
       <mat-icon>chevron_left</mat-icon>
     </button>
-    <span class="text-xl font-semibold">{{ currentDate | date: 'MMMM yyyy' }}</span>
+    <div class="flex space-x-2 mt-5">
+      <mat-form-field appearance="outline" class="w-32">
+        <mat-select [(ngModel)]="selectedMonth" (selectionChange)="onMonthChange($event.value)">
+          <mat-option *ngFor="let month of months" [value]="month">
+            {{ month }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="w-24">
+        <mat-select [(ngModel)]="selectedYear" (selectionChange)="onYearChange($event.value)">
+          <mat-option *ngFor="let year of years" [value]="year">
+            {{ year }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
     <button mat-icon-button (click)="changeMonth(1)" class="hover:bg-indigo-700 transition-colors">
       <mat-icon>chevron_right</mat-icon>
     </button>
@@ -43,9 +58,7 @@
               'text-red-600': event.urgency === 'High'
             }">{{ event.urgency }}</span>
           </div>
-
           <span class="text-sm italic text-gray-500">{{ event.description }}</span>
-
         </div>
       </div>
       <p class="text-black italic" *ngIf="getEventsForDay(selectedDate).length === 0">

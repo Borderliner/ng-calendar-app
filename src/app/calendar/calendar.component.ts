@@ -5,6 +5,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
 import { startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, getDay, startOfWeek, addDays } from 'date-fns';
 import { SplitPipe } from '../split.pipe';
 import { EventDialogComponent, CalendarEvent } from '../event-dialog/event-dialog.component';
@@ -19,6 +21,8 @@ import { EventDialogComponent, CalendarEvent } from '../event-dialog/event-dialo
     MatButtonModule,
     MatListModule,
     MatDialogModule,
+    MatSelectModule,
+    FormsModule,
     SplitPipe,
     EventDialogComponent
   ],
@@ -39,7 +43,26 @@ export class CalendarComponent implements OnInit {
     }
   ];
 
-  constructor(private dialog: MatDialog) {}
+  // Properties for month and year selection
+  selectedMonth: string;
+  selectedYear: number;
+  months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  years: number[] = [];
+
+  constructor(private dialog: MatDialog) {
+    // Initialize selectedMonth and selectedYear
+    this.selectedMonth = this.months[this.currentDate.getMonth()];
+    this.selectedYear = this.currentDate.getFullYear();
+
+    // Generate years range (±10 from current year)
+    const currentYear = this.currentDate.getFullYear();
+    for (let i = currentYear - 50; i <= currentYear + 50; i++) {
+      this.years.push(i);
+    }
+  }
 
   ngOnInit() {
     this.generateCalendar();
@@ -94,6 +117,19 @@ export class CalendarComponent implements OnInit {
 
   changeMonth(offset: number) {
     this.currentDate = new Date(this.currentDate.setMonth(this.currentDate.getMonth() + offset));
+    this.selectedMonth = this.months[this.currentDate.getMonth()]; // Sync dropdown
+    this.selectedYear = this.currentDate.getFullYear(); // Sync dropdown
+    this.generateCalendar();
+  }
+
+  onMonthChange(month: string) {
+    const monthIndex = this.months.indexOf(month);
+    this.currentDate = new Date(this.currentDate.setMonth(monthIndex));
+    this.generateCalendar();
+  }
+
+  onYearChange(year: number) {
+    this.currentDate = new Date(this.currentDate.setFullYear(year));
     this.generateCalendar();
   }
 }
