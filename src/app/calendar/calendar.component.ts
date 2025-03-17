@@ -33,6 +33,7 @@ export class CalendarComponent implements OnInit {
   currentDate = new Date();
   daysInMonth: (Date | null)[] = [];
   selectedDate: Date | null = null;
+  // Some example events
   events: CalendarEvent[] = [
     {
       title: 'Team Meeting',
@@ -53,11 +54,10 @@ export class CalendarComponent implements OnInit {
   years: number[] = [];
 
   constructor(private dialog: MatDialog) {
-    // Initialize selectedMonth and selectedYear
     this.selectedMonth = this.months[this.currentDate.getMonth()];
     this.selectedYear = this.currentDate.getFullYear();
 
-    // Generate years range (±10 from current year)
+    // Generate years range (-+50 from current year)
     const currentYear = this.currentDate.getFullYear();
     for (let i = currentYear - 50; i <= currentYear + 50; i++) {
       this.years.push(i);
@@ -71,7 +71,7 @@ export class CalendarComponent implements OnInit {
   generateCalendar() {
     const monthStart = startOfMonth(this.currentDate);
     const monthEnd = endOfMonth(this.currentDate);
-    const weekStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+    // const weekStart = startOfWeek(monthStart, { weekStartsOn: 0 });
     const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
     const firstDayIndex = getDay(monthStart);

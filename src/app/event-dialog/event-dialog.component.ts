@@ -4,14 +4,14 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select'; // For urgency dropdown
+import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 
 export interface EventDialogData {
   title?: string;
   description?: string;
   time?: string; // e.g., "14:30"
-  urgency?: string; // e.g., "Low", "Medium", "High"
+  urgency?: string | 'Low' | 'Medium' | 'High';
   date?: Date;
 }
 
@@ -40,7 +40,7 @@ export interface CalendarEvent {
 })
 export class EventDialogComponent {
   event: CalendarEvent;
-  urgencyLevels = ['Low', 'Medium', 'High']; // Options for urgency
+  urgencyLevels = ['Low', 'Medium', 'High'];
 
   constructor(
     public dialogRef: MatDialogRef<EventDialogComponent>,
@@ -49,8 +49,8 @@ export class EventDialogComponent {
     this.event = {
       title: data.title || '',
       description: data.description || '',
-      time: data.time || '', // Empty by default, user will input
-      urgency: data.urgency || 'Medium', // Default to Medium
+      time: data.time || '',
+      urgency: data.urgency || 'Medium',
       date: data.date || new Date()
     };
   }
@@ -60,7 +60,7 @@ export class EventDialogComponent {
   }
 
   onSave(): void {
-    if (this.event.title) { // Require title for saving
+    if (this.event.title) {
       this.dialogRef.close(this.event);
     }
   }
