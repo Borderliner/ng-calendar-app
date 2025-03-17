@@ -1,1 +1,41 @@
-<p>calendar works!</p>
+<div class="container mx-auto p-6 max-w-4xl bg-white shadow-lg rounded-lg">
+  <!-- Toolbar -->
+  <mat-toolbar class="flex justify-between items-center mb-6 bg-indigo-600 text-white rounded-t-lg">
+    <button mat-icon-button (click)="changeMonth(-1)" class="hover:bg-indigo-700 transition-colors">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <span class="text-xl font-semibold">{{ currentDate | date: 'MMMM yyyy' }}</span>
+    <button mat-icon-button (click)="changeMonth(1)" class="hover:bg-indigo-700 transition-colors">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <!-- Calendar Grid -->
+  <div class="grid grid-cols-7 gap-1 text-center">
+    <div class="font-bold py-3 bg-gray-200 text-gray-700 rounded" *ngFor="let day of 'SMTWTFS' | split">
+      {{ day }}
+    </div>
+    <div class="p-4 cursor-pointer relative hover:bg-gray-100 transition-colors rounded"
+      *ngFor="let day of daysInMonth"
+      (click)="selectDay(day)"
+      [class]="day && selectedDate && isSameDay(day, selectedDate) ? 'text-white bg-indigo-500 hover:bg-indigo-700' : ''"
+      [class.text-gray-400]="day && day.getMonth() !== currentDate.getMonth()">
+      {{ day ? (day | date: 'd') : '' }}
+      <span class="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-pink-500 rounded-full"
+        *ngIf="day && getEventsForDay(day).length > 0"></span>
+    </div>
+  </div>
+
+  <!-- Events Section -->
+  <div class="mt-6 p-4 bg-gray-50 rounded-lg" *ngIf="selectedDate">
+    <h3 class="text-lg font-semibold text-gray-800">Events for {{ selectedDate | date: 'MMMM d, yyyy' }}</h3>
+    <mat-list>
+      <p class="text-gray-700" *ngFor="let event of getEventsForDay(selectedDate)">
+        {{ event.title }}
+      </p>
+      <p class="text-gray-500 italic" *ngIf="getEventsForDay(selectedDate).length === 0">
+        No events
+      </p>
+    </mat-list>
+  </div>
+</div>
