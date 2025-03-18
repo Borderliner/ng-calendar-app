@@ -1,3 +1,4 @@
+<!-- calendar.component.html -->
 <div class="container mx-auto p-6 max-w-4xl bg-white shadow-lg rounded-lg">
   <!-- Toolbar -->
   <mat-toolbar class="flex! justify-between! items-center! bg-indigo-600! text-white! rounded-t-lg!">
@@ -31,13 +32,19 @@
       {{ day }}
     </div>
     <div class="p-4 cursor-pointer relative hover:bg-gray-100 transition-colors rounded"
-      *ngFor="let day of daysInMonth"
+      *ngFor="let day of daysInMonth; let i = index"
+      [id]="'day-' + i"
       (click)="selectDay(day)"
       (dblclick)="openEventDialog(day)"
       [class]="day && selectedDate && isSameDay(day, selectedDate) ? 'text-white bg-indigo-500 hover:bg-indigo-700' : ''"
-      [class.text-gray-400]="day && day.getMonth() !== currentDate.getMonth()">
+      [class.text-gray-400]="day && day.getMonth() !== currentDate.getMonth()"
+      cdkDropList
+      [cdkDropListData]="day"
+      [cdkDropListConnectedTo]="['events-list']"
+      [cdkDropListDisabled]="!day"
+      (cdkDropListDropped)="drop($event)">
       {{ day ? (day | date: 'd') : '' }}
-      <span class="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-pink-500 rounded-full"
+      <span class="pointer-events-none absolute bottom-2 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-pink-500 rounded-full"
         *ngIf="day && getEventsForDay(day).length > 0"></span>
     </div>
   </div>
@@ -45,8 +52,9 @@
   <!-- Events Section -->
   <div class="mt-6 p-4 bg-gray-50 rounded-lg" *ngIf="selectedDate">
     <h3 class="text-lg font-semibold text-gray-800">Events for {{ selectedDate | date: 'MMMM d, yyyy' }}</h3>
-    <mat-list>
-      <div class="text-gray-700 py-2" *ngFor="let event of getEventsForDay(selectedDate); let i = index">
+    <mat-list id="events-list" cdkDropList [cdkDropListData]="getEventsForDay(selectedDate)" [cdkDropListConnectedTo]="getDayIds()">
+      <div class="text-gray-700 py-2" *ngFor="let event of getEventsForDay(selectedDate); let i = index"
+        cdkDrag>
         <div class="flex flex-col">
           <div class="flex items-center gap-2">
             <span>{{ i + 1 }}.</span>
@@ -57,6 +65,9 @@
               'text-yellow-600': event.urgency === 'Medium',
               'text-red-600': event.urgency === 'High'
             }">{{ event.urgency }}</span>
+            <button mat-icon-button (click)="removeEvent(event)" class="hover:bg-red-200! active:focus:bg-red-400/90! transition-colors duration-300 ease-in-out">
+              <mat-icon class="text-black/60!">delete</mat-icon>
+            </button>
           </div>
           <span class="text-sm italic text-gray-500">{{ event.description }}</span>
         </div>

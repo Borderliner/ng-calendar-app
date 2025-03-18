@@ -1,0 +1,15 @@
+.cdk-drag-preview {
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+.cdk-drop-list-dragging {
+  background: #e0e0e0;
+}
+
+/* Prevent placeholder from affecting layout */
+.cdk-drag-placeholder {
+  display: none;
+}

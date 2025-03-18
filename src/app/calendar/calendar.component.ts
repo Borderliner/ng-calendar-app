@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+// calendar.component.ts
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,9 +8,10 @@ import { MatListModule } from '@angular/material/list';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
-import { startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, getDay, startOfWeek, addDays } from 'date-fns';
+import { startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, getDay, addDays } from 'date-fns';
 import { SplitPipe } from '../split.pipe';
 import { EventDialogComponent, CalendarEvent } from '../event-dialog/event-dialog.component';
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-calendar',
@@ -24,7 +26,8 @@ import { EventDialogComponent, CalendarEvent } from '../event-dialog/event-dialo
     MatSelectModule,
     FormsModule,
     SplitPipe,
-    EventDialogComponent
+    EventDialogComponent,
+    DragDropModule
   ],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.css']
@@ -33,18 +36,16 @@ export class CalendarComponent implements OnInit {
   currentDate = new Date();
   daysInMonth: (Date | null)[] = [];
   selectedDate: Date | null = null;
-  // Some example events
   events: CalendarEvent[] = [
     {
       title: 'Team Meeting',
       description: 'Discuss project updates',
       time: '14:00',
       urgency: 'Medium',
-      date: new Date(2025, 2, 20)
+      date: new Date(2025, 2, 20) // March 20, 2025
     }
   ];
 
-  // Properties for month and year selection
   selectedMonth: string;
   selectedYear: number;
   months = [
@@ -53,11 +54,13 @@ export class CalendarComponent implements OnInit {
   ];
   years: number[] = [];
 
-  constructor(private dialog: MatDialog) {
+  constructor(
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef
+  ) {
     this.selectedMonth = this.months[this.currentDate.getMonth()];
     this.selectedYear = this.currentDate.getFullYear();
 
-    // Generate years range (-+50 from current year)
     const currentYear = this.currentDate.getFullYear();
     for (let i = currentYear - 50; i <= currentYear + 50; i++) {
       this.years.push(i);
@@ -71,7 +74,6 @@ export class CalendarComponent implements OnInit {
   generateCalendar() {
     const monthStart = startOfMonth(this.currentDate);
     const monthEnd = endOfMonth(this.currentDate);
-    // const weekStart = startOfWeek(monthStart, { weekStartsOn: 0 });
     const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
     const firstDayIndex = getDay(monthStart);
@@ -101,6 +103,7 @@ export class CalendarComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.events.push(result);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -117,8 +120,8 @@ export class CalendarComponent implements OnInit {
 
   changeMonth(offset: number) {
     this.currentDate = new Date(this.currentDate.setMonth(this.currentDate.getMonth() + offset));
-    this.selectedMonth = this.months[this.currentDate.getMonth()]; // Sync dropdown
-    this.selectedYear = this.currentDate.getFullYear(); // Sync dropdown
+    this.selectedMonth = this.months[this.currentDate.getMonth()];
+    this.selectedYear = this.currentDate.getFullYear();
     this.generateCalendar();
   }
 
@@ -131,5 +134,27 @@ export class CalendarComponent implements OnInit {
   onYearChange(year: number) {
     this.currentDate = new Date(this.currentDate.setFullYear(year));
     this.generateCalendar();
+  }
+
+  getDayIds(): string[] {
+    return this.daysInMonth.map((_, i) => 'day-' + i);
+  }
+
+  drop(event: CdkDragDrop<any>) {
+    if (event.previousContainer.id === 'events-list' && event.previousContainer !== event.container) {
+      const eventToMove = (event.previousContainer.data as CalendarEvent[])[event.previousIndex];
+      const newDate = event.container.data as Date | null;
+      if (newDate) {
+        console.log('Moving:', eventToMove.title, 'to', newDate);
+        eventToMove.date = new Date(newDate);
+        this.events = [...this.events]; // Force array reassignment
+        this.cdr.detectChanges();
+      }
+    }
+  }
+
+  removeEvent(eventToRemove: CalendarEvent) {
+    this.events = this.events.filter(event => event !== eventToRemove);
+    this.cdr.detectChanges();
   }
 }
