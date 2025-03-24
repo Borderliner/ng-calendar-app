@@ -1,41 +1,43 @@
+<!-- event-dialog.component.html -->
 <div class="p-6">
-  <h2 class="text-xl font-semibold text-gray-200 mb-4">Add New Event</h2>
-  <form class="space-y-4">
-    <!-- Title -->
+  <h2 class="text-xl font-semibold text-gray-200 mb-4">{{data.title ? 'Edit Event' : 'Add New Event'}}</h2>
+  <form [formGroup]="eventForm" class="space-y-4">
     <mat-form-field class="w-full">
       <mat-label>Event Title</mat-label>
-      <input matInput [(ngModel)]="event.title" name="title" required class="text-black">
+      <input matInput formControlName="title" class="text-black">
+      <mat-error *ngIf="eventForm.get('title')?.hasError('required')">
+        Title is required
+      </mat-error>
     </mat-form-field>
 
-    <!-- Description -->
     <mat-form-field class="w-full">
       <mat-label>Description</mat-label>
-      <textarea matInput [(ngModel)]="event.description" name="description" rows="3" class="text-black"></textarea>
+      <textarea matInput formControlName="description" rows="3" class="text-black"></textarea>
     </mat-form-field>
 
-    <!-- Time -->
     <mat-form-field class="w-full">
       <mat-label>Time</mat-label>
-      <input matInput type="time" [(ngModel)]="event.time" name="time" class="text-black">
+      <input matInput type="time" formControlName="time" class="text-black">
+      <mat-error *ngIf="eventForm.get('time')?.hasError('pattern')">
+        Please enter valid time (HH:MM)
+      </mat-error>
     </mat-form-field>
 
-    <!-- Urgency -->
     <mat-form-field class="w-full">
       <mat-label>Urgency</mat-label>
-      <mat-select [(ngModel)]="event.urgency" name="urgency">
+      <mat-select formControlName="urgency">
         <mat-option *ngFor="let level of urgencyLevels" [value]="level">
           {{ level }}
         </mat-option>
       </mat-select>
     </mat-form-field>
 
-    <!-- Buttons -->
     <div class="flex justify-end space-x-2">
       <button mat-button (click)="onCancel()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
         Cancel
       </button>
       <button mat-button (click)="onSave()" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-        [disabled]="!event.title">
+        [disabled]="eventForm.invalid">
         Save
       </button>
     </div>

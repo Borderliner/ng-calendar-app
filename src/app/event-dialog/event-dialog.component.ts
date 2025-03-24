@@ -1,17 +1,18 @@
+// event-dialog.component.ts
 import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
-import { FormsModule } from '@angular/forms';
 
 export interface EventDialogData {
   title?: string;
   description?: string;
-  time?: string; // e.g., "14:30"
-  urgency?: string | 'Low' | 'Medium' | 'High';
+  time?: string;
+  urgency?: string;
   date?: Date;
 }
 
@@ -33,26 +34,27 @@ export interface CalendarEvent {
     MatInputModule,
     MatButtonModule,
     MatSelectModule,
-    FormsModule
+    ReactiveFormsModule
   ],
   templateUrl: './event-dialog.component.html',
   styleUrls: ['./event-dialog.component.css']
 })
 export class EventDialogComponent {
-  event: CalendarEvent;
+  eventForm: FormGroup;
   urgencyLevels = ['Low', 'Medium', 'High'];
 
   constructor(
     public dialogRef: MatDialogRef<EventDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: EventDialogData
+    @Inject(MAT_DIALOG_DATA) public data: EventDialogData,
+    private fb: FormBuilder
   ) {
-    this.event = {
-      title: data.title || '',
-      description: data.description || '',
-      time: data.time || '',
-      urgency: data.urgency || 'Medium',
-      date: data.date || new Date()
-    };
+    this.eventForm = this.fb.group({
+      title: [data.title || '', Validators.required],
+      description: [data.description || ''],
+      time: [data.time || '', Validators.pattern('^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$')],
+      urgency: [data.urgency || 'Medium', Validators.required],
+      date: [data.date || new Date(), Validators.required]
+    });
   }
 
   onCancel(): void {
@@ -60,8 +62,8 @@ export class EventDialogComponent {
   }
 
   onSave(): void {
-    if (this.event.title) {
-      this.dialogRef.close(this.event);
+    if (this.eventForm.valid) {
+      this.dialogRef.close(this.eventForm.value);
     }
   }
 }
