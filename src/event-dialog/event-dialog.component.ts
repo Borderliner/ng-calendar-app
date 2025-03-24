@@ -18,7 +18,7 @@ export interface EventDialogData {
 }
 
 export interface CalendarEvent {
-  id?: string | number,
+  id?: string,
   title: string;
   description: string;
   time: string;

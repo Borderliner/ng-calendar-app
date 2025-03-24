@@ -7,7 +7,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
-import { SplitPipe } from '../split.pipe';
+import { SplitPipe } from '../app/split.pipe';
 import { EventDialogComponent, CalendarEvent } from '../event-dialog/event-dialog.component';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CalendarService } from './calendar.service';

@@ -36,12 +36,12 @@
     <div class="font-bold py-3 bg-gray-200 text-gray-700 rounded" *ngFor="let day of 'SMTWTFS' | split">
       {{ day }}
     </div>
-    <div class="p-4 h-14! cursor-pointer relative hover:bg-gray-100 transition-colors rounded"
+    <div class="p-4 h-14! cursor-pointer relative hover:bg-gray-100 active:focus:bg-gray-200 transition-colors duration-300 ease-in-out rounded"
       *ngFor="let day of daysInMonth; let i = index"
       [id]="'day-' + i"
       (click)="selectDay(day)"
       (dblclick)="openEventDialog(day)"
-      [class]="day && selectedDate && isSameDay(day, selectedDate) ? 'text-white bg-indigo-500 hover:bg-indigo-700' : ''"
+      [class]="day && selectedDate && isSameDay(day, selectedDate) ? 'text-white bg-indigo-500 hover:bg-indigo-600 active:focus:bg-indigo-700' : ''"
       [class.text-gray-400]="day && day.getMonth() !== currentDate.getMonth()"
       cdkDropList
       [cdkDropListData]="day"
