@@ -9,7 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { SplitPipe } from '../split.pipe';
 import { EventDialogComponent, CalendarEvent } from '../event-dialog/event-dialog.component';
-import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CalendarService } from './calendar.service';
 import { Observable } from 'rxjs';
 import { isSameDay } from 'date-fns';
@@ -37,7 +37,7 @@ export class CalendarComponent implements OnInit {
   daysInMonth: (Date | null)[] = [];
   selectedDate: Date | null = null;
   events$: Observable<CalendarEvent[]>;
-  events: CalendarEvent[] = []; // Add this to hold the current events
+  events: CalendarEvent[] = [];
 
   selectedMonth: string;
   selectedYear: number;
@@ -63,7 +63,6 @@ export class CalendarComponent implements OnInit {
 
   ngOnInit() {
     this.generateCalendar();
-    // Subscribe to events$ to keep the local events array updated
     this.events$.subscribe(events => {
       this.events = events || [];
     });
@@ -97,7 +96,6 @@ export class CalendarComponent implements OnInit {
 
   getEventsForDay(day: Date | null, events?: CalendarEvent[] | null): CalendarEvent[] {
     if (!day) return [];
-    // Use the local events array if no events parameter is provided
     const eventsToFilter = events !== undefined && events !== null ? events : this.events;
     return eventsToFilter.filter(event => isSameDay(event.date, day)) || [];
   }
@@ -138,12 +136,37 @@ export class CalendarComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<any>) {
-    if (event.previousContainer.id === 'events-list' && event.previousContainer !== event.container) {
-      const eventToMove = (event.previousContainer.data as CalendarEvent[])[event.previousIndex];
-      const newDate = event.container.data as Date | null;
-      if (newDate) {
-        eventToMove.date = new Date(newDate);
-        this.calendarService.updateEvent(eventToMove);
+    if (event.previousContainer === event.container) {
+      // Reordering within the same container
+      if (event.container.id === 'events-list') {
+        const eventsForDay = event.container.data as CalendarEvent[];
+        moveItemInArray(eventsForDay, event.previousIndex, event.currentIndex);
+        const otherEvents = this.events.filter(e => !this.selectedDate || !isSameDay(e.date, this.selectedDate));
+        this.events = [...otherEvents, ...eventsForDay];
+        this.events.forEach(e => this.calendarService.updateEvent(e)); // Persist the new order
+      }
+      // No action for calendar days since they don’t support reordering
+    } else {
+      // Moving between containers
+      if (event.previousContainer.id === 'events-list' && event.container.id.startsWith('day-')) {
+        // Moving from events list to calendar grid
+        const eventToMove = (event.previousContainer.data as CalendarEvent[])[event.previousIndex];
+        const newDate = event.container.data as Date | null;
+        if (newDate) {
+          eventToMove.date = new Date(newDate);
+          this.calendarService.updateEvent(eventToMove);
+          if (this.selectedDate && isSameDay(this.selectedDate, newDate)) {
+            this.selectedDate = newDate; // Keep selected date in sync
+          }
+        }
+      } else if (event.previousContainer.id.startsWith('day-') && event.container.id === 'events-list') {
+        // Moving from calendar grid to events list
+        const eventToMove = this.events.find(e => isSameDay(e.date, event.previousContainer.data as Date))!;
+        const targetDate = this.selectedDate;
+        if (targetDate) {
+          eventToMove.date = new Date(targetDate);
+          this.calendarService.updateEvent(eventToMove);
+        }
       }
     }
   }
