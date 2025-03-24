@@ -106,7 +106,9 @@ export class CalendarComponent implements OnInit {
   }
 
   changeMonth(offset: number) {
-    this.currentDate = new Date(this.currentDate.setMonth(this.currentDate.getMonth() + offset));
+    const newDate = new Date(this.currentDate);
+    newDate.setMonth(newDate.getMonth() + offset);
+    this.currentDate = newDate;
     this.selectedMonth = this.months[this.currentDate.getMonth()];
     this.selectedYear = this.currentDate.getFullYear();
     this.generateCalendar();
@@ -145,7 +147,6 @@ export class CalendarComponent implements OnInit {
         this.events = [...otherEvents, ...eventsForDay];
         this.events.forEach(e => this.calendarService.updateEvent(e)); // Persist the new order
       }
-      // No action for calendar days since they don’t support reordering
     } else {
       // Moving between containers
       if (event.previousContainer.id === 'events-list' && event.container.id.startsWith('day-')) {
@@ -156,7 +157,7 @@ export class CalendarComponent implements OnInit {
           eventToMove.date = new Date(newDate);
           this.calendarService.updateEvent(eventToMove);
           if (this.selectedDate && isSameDay(this.selectedDate, newDate)) {
-            this.selectedDate = newDate; // Keep selected date in sync
+            this.selectedDate = newDate;
           }
         }
       } else if (event.previousContainer.id.startsWith('day-') && event.container.id === 'events-list') {

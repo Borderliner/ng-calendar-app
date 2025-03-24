@@ -42,7 +42,7 @@ app.use(
  */
 app.use('/**', (req, res, next) => {
   // Log the header for debugging
-  console.log('X-Calendar-Events:', req.headers['X-Calendar-Events']);
+  // console.log('X-Calendar-Events:', req.headers['X-Calendar-Events']);
   angularApp
     .handle(req)
     .then((response) =>

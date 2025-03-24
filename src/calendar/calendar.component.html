@@ -48,7 +48,7 @@
       [cdkDropListConnectedTo]="['events-list']"
       [cdkDropListDisabled]="!day"
       (cdkDropListDropped)="drop($event)">
-      {{ day ? (day | date: 'd') : '' }}
+      {{ day && day.getTime() ? (day | date: 'd') : '' }}
       <div class="pointer-events-none absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1"
         *ngIf="day">
         <span *ngFor="let _ of [].constructor(getEventsForDay(day).length)"

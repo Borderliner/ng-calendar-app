@@ -1,4 +1,3 @@
-// event-dialog.component.ts
 import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -39,7 +38,6 @@ export interface CalendarEvent {
     ReactiveFormsModule
   ],
   templateUrl: './event-dialog.component.html',
-  styleUrls: ['./event-dialog.component.css']
 })
 export class EventDialogComponent {
   eventForm: FormGroup;
