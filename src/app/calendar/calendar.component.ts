@@ -1,4 +1,3 @@
-// calendar.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -7,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { SplitPipe } from '../split.pipe';
 import { EventDialogComponent, CalendarEvent } from '../event-dialog/event-dialog.component';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
@@ -26,9 +25,8 @@ import { isSameDay } from 'date-fns';
     MatListModule,
     MatDialogModule,
     MatSelectModule,
-    ReactiveFormsModule,
+    FormsModule,
     SplitPipe,
-    EventDialogComponent,
     DragDropModule
   ],
   templateUrl: './calendar.component.html',
@@ -39,6 +37,7 @@ export class CalendarComponent implements OnInit {
   daysInMonth: (Date | null)[] = [];
   selectedDate: Date | null = null;
   events$: Observable<CalendarEvent[]>;
+  events: CalendarEvent[] = []; // Add this to hold the current events
 
   selectedMonth: string;
   selectedYear: number;
@@ -64,6 +63,10 @@ export class CalendarComponent implements OnInit {
 
   ngOnInit() {
     this.generateCalendar();
+    // Subscribe to events$ to keep the local events array updated
+    this.events$.subscribe(events => {
+      this.events = events || [];
+    });
   }
 
   generateCalendar() {
@@ -92,15 +95,30 @@ export class CalendarComponent implements OnInit {
     });
   }
 
-  getEventsForDay(day: Date | null, events: CalendarEvent[]): CalendarEvent[] {
+  getEventsForDay(day: Date | null, events?: CalendarEvent[] | null): CalendarEvent[] {
     if (!day) return [];
-    return events.filter(event => isSameDay(event.date, day));
+    // Use the local events array if no events parameter is provided
+    const eventsToFilter = events !== undefined && events !== null ? events : this.events;
+    return eventsToFilter.filter(event => isSameDay(event.date, day)) || [];
+  }
+
+  isSameDay(date1: Date | null, date2: Date): boolean {
+    if (!date1) return false;
+    return isSameDay(date1, date2);
   }
 
   changeMonth(offset: number) {
     this.currentDate = new Date(this.currentDate.setMonth(this.currentDate.getMonth() + offset));
     this.selectedMonth = this.months[this.currentDate.getMonth()];
     this.selectedYear = this.currentDate.getFullYear();
+    this.generateCalendar();
+  }
+
+  goToToday() {
+    this.currentDate = new Date();
+    this.selectedMonth = this.months[this.currentDate.getMonth()];
+    this.selectedYear = this.currentDate.getFullYear();
+    this.selectedDate = this.currentDate;
     this.generateCalendar();
   }
 

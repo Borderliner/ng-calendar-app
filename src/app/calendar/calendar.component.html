@@ -1,4 +1,3 @@
-<!-- calendar.component.html -->
 <div class="container mx-auto p-6 max-w-4xl bg-white shadow-lg rounded-lg">
   <!-- Toolbar -->
   <mat-toolbar class="flex! justify-between! items-center! bg-indigo-600! text-white! rounded-t-lg!">
@@ -21,9 +20,15 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <button mat-icon-button (click)="changeMonth(1)" class="hover:bg-indigo-700 transition-colors">
-      <mat-icon>chevron_right</mat-icon>
-    </button>
+    <div class="flex flex-row gap-2">
+      <button mat-button (click)="goToToday()" class="flex flex-row gap-0.5 items-center justify-center hover:bg-indigo-700 transition-colors">
+        <mat-icon>calendar_today</mat-icon>
+        <p class="text-sm">Today</p>
+      </button>
+      <button mat-icon-button (click)="changeMonth(1)" class="hover:bg-indigo-700 transition-colors">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
   </mat-toolbar>
 
   <!-- Calendar Grid -->
@@ -44,37 +49,47 @@
       [cdkDropListDisabled]="!day"
       (cdkDropListDropped)="drop($event)">
       {{ day ? (day | date: 'd') : '' }}
-      <span class="pointer-events-none absolute bottom-2 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-pink-500 rounded-full"
-        *ngIf="day && getEventsForDay(day).length > 0"></span>
+      <div class="pointer-events-none absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1"
+        *ngIf="day">
+        <span *ngFor="let _ of [].constructor(getEventsForDay(day).length)"
+          class="w-2 h-2 bg-pink-500 rounded-full"></span>
+      </div>
     </div>
   </div>
 
   <!-- Events Section -->
   <div class="mt-6 p-4 bg-gray-50 rounded-lg" *ngIf="selectedDate">
     <h3 class="text-lg font-semibold text-gray-800">Events for {{ selectedDate | date: 'MMMM d, yyyy' }}</h3>
-    <mat-list id="events-list" cdkDropList [cdkDropListData]="getEventsForDay(selectedDate)" [cdkDropListConnectedTo]="getDayIds()">
-      <div class="text-gray-700 py-2" *ngFor="let event of getEventsForDay(selectedDate); let i = index"
-        cdkDrag>
-        <div class="flex flex-col">
-          <div class="flex items-center gap-2">
-            <span>{{ i + 1 }}.</span>
-            <span class="font-medium">{{ event.title }}</span>
-            <span class="text-sm text-gray-500">({{ event.time }})</span>
-            <span class="text-sm" [ngClass]="{
-              'text-green-600': event.urgency === 'Low',
-              'text-yellow-600': event.urgency === 'Medium',
-              'text-red-600': event.urgency === 'High'
-            }">{{ event.urgency }}</span>
-            <button mat-icon-button (click)="removeEvent(event)" class="hover:bg-red-200! active:focus:bg-red-400/90! transition-colors duration-300 ease-in-out">
-              <mat-icon class="text-black/60!">delete</mat-icon>
-            </button>
+    <div id="events-list" cdkDropList [cdkDropListData]="getEventsForDay(selectedDate, events$ | async)" [cdkDropListConnectedTo]="getDayIds()"
+      class="grid! grid-cols-1! md:grid-cols-2! gap-4">
+      <div class="text-gray-700 py-2 bg-white rounded shadow-sm" *ngFor="let event of getEventsForDay(selectedDate, events$ | async); let i = index" cdkDrag>
+        <div class="flex flex-col p-2">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 flex-grow">
+              <span>{{ i + 1 }}.</span>
+              <span class="font-medium">{{ event.title }}</span>
+              <span class="text-sm text-gray-500">({{ event.time }})</span>
+              <span class="text-sm" [ngClass]="{
+                'text-green-600': event.urgency === 'Low',
+                'text-yellow-600': event.urgency === 'Medium',
+                'text-red-600': event.urgency === 'High'
+              }">{{ event.urgency }}</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <button mat-icon-button (click)="editEvent(event)" class="hover:bg-blue-200! transition-colors">
+                <mat-icon class="text-black/60!">edit</mat-icon>
+              </button>
+              <button mat-icon-button (click)="removeEvent(event)" class="hover:bg-red-200! transition-colors">
+                <mat-icon class="text-black/60!">delete</mat-icon>
+              </button>
+            </div>
           </div>
           <span class="text-sm italic text-gray-500">{{ event.description }}</span>
         </div>
       </div>
-      <p class="text-black italic" *ngIf="getEventsForDay(selectedDate).length === 0">
+      <p class="text-black italic col-span-2 text-center" *ngIf="getEventsForDay(selectedDate, events$ | async)?.length === 0">
         No events
       </p>
-    </mat-list>
+    </div>
   </div>
 </div>

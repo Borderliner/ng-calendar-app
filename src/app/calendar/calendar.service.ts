@@ -2,10 +2,16 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { CalendarEvent } from '../event-dialog/event-dialog.component';
-import { startOfMonth, endOfMonth, eachDayOfInterval, getDay, addDays } from 'date-fns';
+import {
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  getDay,
+  addDays,
+} from 'date-fns';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CalendarService {
   private eventsSubject = new BehaviorSubject<CalendarEvent[]>([
@@ -14,25 +20,26 @@ export class CalendarService {
       description: 'Discuss project updates',
       time: '14:00',
       urgency: 'Medium',
-      date: new Date(2025, 2, 20)
-    }
+      date: new Date(2025, 2, 20),
+    },
   ]);
-  events$ = this.eventsSubject.asObservable();
+  private events$ = this.eventsSubject.asObservable();
 
-  getEvents(): Observable<CalendarEvent[]> {
+  public getEvents(): Observable<CalendarEvent[]> {
     return this.events$;
   }
 
-  addEvent(event: CalendarEvent): void {
+  public addEvent(event: CalendarEvent): void {
     const currentEvents = this.eventsSubject.value;
     this.eventsSubject.next([...currentEvents, event]);
   }
 
-  updateEvent(updatedEvent: CalendarEvent): void {
+  public updateEvent(updatedEvent: CalendarEvent): void {
     const currentEvents = this.eventsSubject.value;
-    const index = currentEvents.findIndex(e =>
-      e.title === updatedEvent.title &&
-      e.date.getTime() === updatedEvent.date.getTime()
+    const index = currentEvents.findIndex(
+      (e) =>
+        e.title === updatedEvent.title &&
+        e.date.getTime() === updatedEvent.date.getTime()
     );
     if (index !== -1) {
       currentEvents[index] = updatedEvent;
@@ -40,12 +47,14 @@ export class CalendarService {
     }
   }
 
-  removeEvent(eventToRemove: CalendarEvent): void {
+  public removeEvent(eventToRemove: CalendarEvent): void {
     const currentEvents = this.eventsSubject.value;
-    this.eventsSubject.next(currentEvents.filter(event => event !== eventToRemove));
+    this.eventsSubject.next(
+      currentEvents.filter((event) => event !== eventToRemove)
+    );
   }
 
-  generateCalendar(currentDate: Date): (Date | null)[] {
+  public generateCalendar(currentDate: Date): (Date | null)[] {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
     const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
@@ -60,7 +69,7 @@ export class CalendarService {
       const nextMonthStart = addDays(monthEnd, 1);
       const nextDays = eachDayOfInterval({
         start: nextMonthStart,
-        end: addDays(nextMonthStart, remainingCells - 1)
+        end: addDays(nextMonthStart, remainingCells - 1),
       });
       daysInMonth = [...daysInMonth, ...nextDays];
     }
