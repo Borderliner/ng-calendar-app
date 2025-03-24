@@ -37,7 +37,6 @@ export class CalendarService {
   }
 
   public updateEvent(updatedEvent: CalendarEvent): void {
-    console.warn('Event to update:', updatedEvent)
     const currentEvents = this.eventsSubject.value;
     const index = currentEvents.findIndex(e => e.id === updatedEvent.id);
     if (index !== -1) {
