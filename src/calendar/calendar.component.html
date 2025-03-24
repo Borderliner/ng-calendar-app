@@ -1,11 +1,11 @@
-<div class="container mx-auto p-6 max-w-4xl bg-white shadow-lg rounded-lg">
+<div class="container mx-auto p-6 mt-10 max-w-4xl bg-white shadow-lg rounded-lg">
   <!-- Toolbar -->
   <mat-toolbar class="flex! justify-between! items-center! bg-indigo-600! text-white! rounded-t-lg!">
     <button mat-icon-button (click)="changeMonth(-1)" class="hover:bg-indigo-700 transition-colors">
       <mat-icon>chevron_left</mat-icon>
     </button>
-    <div class="flex space-x-2 mt-5">
-      <mat-form-field appearance="outline" class="w-32">
+    <div class="flex space-x-2 mt-5 relative left-8">
+      <mat-form-field appearance="outline" class="w-32 bg-transparent">
         <mat-select [(ngModel)]="selectedMonth" (selectionChange)="onMonthChange($event.value)">
           <mat-option *ngFor="let month of months" [value]="month">
             {{ month }}

@@ -1,6 +1,11 @@
 {
   "name": "calendar-app",
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "author": {
+    "name": "Mohammadreza Hajianpour",
+    "email": "hajianpour.mr@gmail.com",
+    "url": "https://reza.hajianpour.ir/"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
