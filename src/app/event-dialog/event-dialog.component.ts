@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 
 export interface EventDialogData {
+  id?: string | number,
   title?: string;
   description?: string;
   time?: string;
@@ -17,6 +18,7 @@ export interface EventDialogData {
 }
 
 export interface CalendarEvent {
+  id?: string | number,
   title: string;
   description: string;
   time: string;
@@ -49,6 +51,7 @@ export class EventDialogComponent {
     private fb: FormBuilder
   ) {
     this.eventForm = this.fb.group({
+      id: [data.id || undefined],
       title: [data.title || '', Validators.required],
       description: [data.description || ''],
       time: [data.time || '', Validators.pattern('^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$')],

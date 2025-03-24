@@ -62,7 +62,7 @@
     <h3 class="text-lg mb-2 font-semibold text-gray-800">Events for {{ selectedDate | date: 'MMMM d, yyyy' }}</h3>
     <div id="events-list" cdkDropList [cdkDropListData]="getEventsForDay(selectedDate, events$ | async)" [cdkDropListConnectedTo]="getDayIds()"
       class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="text-gray-700! py-2 bg-white rounded shadow-sm min-h-[80px]" *ngFor="let event of getEventsForDay(selectedDate, events$ | async); let i = index" cdkDrag>
+      <div class="text-gray-700! py-2 cursor-grab bg-white rounded shadow-sm min-h-[80px]" *ngFor="let event of getEventsForDay(selectedDate, events$ | async); let i = index" cdkDrag>
         <div class="flex flex-col p-2">
           <div class="flex items-center justify-between gap-2 min-h-[40px]">
             <div class="flex items-center gap-2 flex-grow">

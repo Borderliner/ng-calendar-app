@@ -16,6 +16,7 @@ import {
 export class CalendarService {
   private eventsSubject = new BehaviorSubject<CalendarEvent[]>([
     {
+      id: 1,
       title: 'Team Meeting',
       description: 'Discuss project updates',
       time: '14:00',
@@ -31,27 +32,26 @@ export class CalendarService {
 
   public addEvent(event: CalendarEvent): void {
     const currentEvents = this.eventsSubject.value;
-    this.eventsSubject.next([...currentEvents, event]);
+    const newEvent = { ...event, id: event.id || Date.now().toString() };
+    this.eventsSubject.next([...currentEvents, newEvent]);
   }
 
   public updateEvent(updatedEvent: CalendarEvent): void {
+    console.warn('Event to update:', updatedEvent)
     const currentEvents = this.eventsSubject.value;
-    const index = currentEvents.findIndex(
-      (e) =>
-        e.title === updatedEvent.title &&
-        e.date.getTime() === updatedEvent.date.getTime()
-    );
+    const index = currentEvents.findIndex(e => e.id === updatedEvent.id);
     if (index !== -1) {
-      currentEvents[index] = updatedEvent;
+      currentEvents[index] = { ...updatedEvent };
       this.eventsSubject.next([...currentEvents]);
+    } else {
+      console.warn('Event not found for update:', updatedEvent);
     }
   }
 
   public removeEvent(eventToRemove: CalendarEvent): void {
     const currentEvents = this.eventsSubject.value;
-    this.eventsSubject.next(
-      currentEvents.filter((event) => event !== eventToRemove)
-    );
+    const updatedEvents = currentEvents.filter(e => e.id !== eventToRemove.id);
+    this.eventsSubject.next(updatedEvents);
   }
 
   public generateCalendar(currentDate: Date): (Date | null)[] {
